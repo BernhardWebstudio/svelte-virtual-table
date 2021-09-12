@@ -13,6 +13,7 @@
 
     // props
     export let items
+    export let requireBorderCollapse = false
     let className = ''
     export { className as class }
 
@@ -29,6 +30,7 @@
     let bottom = 0
     let contents
     let head_height = 0
+    let foot_height = 0
     let height_map = []
     let mounted
     let rows
@@ -67,7 +69,7 @@
         end = i
         const remaining = items.length - end
         average_height = (top + content_height) / end
-        bottom = remaining * average_height
+        bottom = remaining * average_height + foot_height
         height_map.length = items.length
         await scrollToIndex(0, { behavior: 'auto' })
     }
@@ -75,9 +77,10 @@
     async function handleScroll() {
         rows = contents.children
         const isStartOverflow = items.length < start
+        const head_height_to_respect = requireBorderCollapse ? 0 : head_height
 
         if (isStartOverflow) {
-            console.log("Start overflow")
+            console.log('Start overflow')
             await scrollToIndex(items.length - 1, { behavior: 'auto' })
         }
 
@@ -93,7 +96,7 @@
         // loop items to find new start
         while (i < items.length) {
             const row_height = height_map[i] || average_height
-            if (y + row_height + head_height > scrollTop) {
+            if (y + row_height + head_height_to_respect > scrollTop) {
                 new_start = i
                 top = y // + row_height
                 break
@@ -109,20 +112,23 @@
             top,
             bottom,
             scrollTop,
-            head_height,
+            head_height_to_respect,
             average_height
         )
         // loop items to find end
         while (i < items.length) {
             y += height_map[i] || average_height
             i += 1
-            if (y > scrollTop + viewport_height - head_height) {
+            if (y > scrollTop + viewport_height - head_height_to_respect) {
                 break
             }
         }
         start = new_start
         end = i
         const remaining = items.length - end
+        if (end === 0) {
+            end = 10;
+        }
         average_height = y / end
         let remaining_height = remaining * average_height // 0
         // compute height map for remaining items
@@ -133,6 +139,9 @@
         }
         // find the
         bottom = remaining_height
+        if (!isFinite(bottom)) {
+            bottom = 200000
+        }
 
         console.log(
             'b',
@@ -167,7 +176,7 @@
     $: sortedItems = sorted([...items], sortOrder)
 
     $: visible = sortedItems
-        .slice(start, end) //Math.max(0, start - 5), Math.min(sortedItems.length, end + 3))
+        .slice(Math.max(0, start - 5), Math.min(sortedItems.length, end + 3)) // start, end) // 
         .map((data, i) => {
             return { index: i + start, data }
         })
@@ -253,18 +262,84 @@
     })
 </script>
 
-<style>
+<p class="debug">
+    Debug: {viewport_height}, {average_height}, {height}, {top}, {bottom}
+</p>
+
+<svelte-virtual-table-viewport>
+    <table
+        class:require-border-collapse={requireBorderCollapse}
+        class="{CLASSNAME_TABLE}
+        {className} table"
+        bind:this={viewport}
+        bind:offsetHeight={viewport_height}
+        on:scroll={handleScroll}
+        style="height: {height}; --p-top: {top}px; --p-bottom: {bottom}px; --head-height: {head_height}px; --foot-height: {foot_height}px"
+    >
+        <thead class="thead" bind:this={thead} bind:offsetHeight={head_height}>
+            <slot name="thead" />
+        </thead>
+        <tbody
+            style="--p-top: {top}px; --p-bottom: {bottom}px;"
+            bind:this={contents}
+            class="tbody"
+        >
+            {#each visible as item}
+                <slot name="tbody" item={item.data} index={item.index}>
+                    Missing Table Row
+                </slot>
+            {/each}
+        </tbody>
+        <tfoot class="tfoot" bind:offsetHeight={foot_height}>
+            <slot name="tfoot" />
+        </tfoot>
+    </table>
+</svelte-virtual-table-viewport>
+
+<style type="text/css">
     .debug {
-        display: none;
+        display: block;
     }
     .container {
         max-height: 100vh;
     }
-    thead, tfoot, tbody {
+    table,
+    .table {
+        position: relative;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        max-height: 100vh;
+        box-sizing: border-box;
+        /* table-layout: fixed; */
+    }
+    table:not(.require-border-collapse) {
+        display: block;
+    }
+    table:not(.require-border-collapse) :is(thead, tfoot, tbody) {
         display: table;
         table-layout: fixed;
         width: 100%;
     }
+    table.require-border-collapse thead {
+        padding-top: var(--p-top);
+    }
+    table.require-border-collapse tfoot {
+        padding-bottom: var(--p-bottom);
+    }
+    table.require-border-collapse {
+        border-collapse: collapse;
+    }
+    table:not(.require-border-collapse) tbody {
+        padding-top: var(--p-top);
+        padding-bottom: var(--p-bottom);
+    }
+    tbody {
+        position: relative;
+        box-sizing: border-box;
+        border: 0px solid currentColor;
+    }
+
+    /** sortable styles */
     thead :global(th.sortable),
     .thead :global(.th.sortable) {
         cursor: pointer;
@@ -273,88 +348,4 @@
         -webkit-user-select: none;
         -ms-user-select: none;
     }
-    thead :global(tr),
-    .thead :global(.tr) {
-        /* position: absolute; */
-    }
-    table,
-    .table {
-        position: relative;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-        display: block;
-        max-height: 100vh;
-        box-sizing: border-box;
-        /* table-layout: fixed; */
-    }
-    tbody,
-    .tbody {
-        position: relative;
-        box-sizing: border-box;
-        border: 0px solid currentColor;
-        padding-top: var(--p-top);
-        padding-bottom: var(--p-bottom);
-    }
-    /* tbody :global(> tr:first-child) {
-        height: var(--p-top);
-    }
-
-    tbody :global(> tr:last-child) {
-        height: var(--p-bottom);
-    } */
-
-    /* tbody::before, .tbody::before {
-        box-sizing: border-box;
-        content: ' ';
-        display: block;
-        height: var(--p-top);
-    }
-    tbody::after, .tbody::after {
-        box-sizing: border-box;
-        content: ' ';
-        display: block;
-        height: var(--p-bottom);
-    } */
-    /* tbody {
-        display: block;
-    } */
-    slot[name='tbody'],
-    tbody > :global(tr),
-    .tbody > :global(.tr) {
-        /* height: 30px !important; */
-        overflow: auto;
-        /* display: block;
-        min-height: 100px; */
-    }
 </style>
-
-<p class="debug">
-    Debug: {viewport_height}, {average_height}, {height}, {top}, {bottom}
-</p>
-
-<svelte-virtual-table-viewport>
-    <table
-        class="{CLASSNAME_TABLE}
-        {className} table"
-        bind:this={viewport}
-        bind:offsetHeight={viewport_height}
-        on:scroll={handleScroll}
-        style="height: {height};">
-        <thead class="thead" bind:this={thead} bind:offsetHeight={head_height}>
-            <slot name="thead" />
-        </thead>
-        <tbody
-            style="--p-top: {top}px; --p-bottom: {bottom}px;"
-            bind:this={contents}
-            class="tbody">
-            {#each visible as item}
-                <slot name="tbody" item={item.data} index={item.index}>
-                    Missing Table Row
-                </slot>
-            {/each}
-        </tbody>
-        <tfoot class="tfoot">
-            <slot name="tfoot" />
-        </tfoot>
-    </table>
-</svelte-virtual-table-viewport>

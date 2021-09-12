@@ -105,10 +105,15 @@ Make sure to assign widths to your table cells (see the example-app for a possib
 One of the objectives was to use native HTML `<table>`, `<thead>`, `<tbody>` etc.
 As these are not block-type elements, the original intention to use padding as a means to indicate the table's "scrollability" of the inner table is not possible.
 
-There are two workarounds:
-either apply a border, or use `::before`- and `::after`-pseudo elements.
+There are numerous workarounds, that were attempted:
 
-The latter could work e.g. like this:
+-   apply a border to `<tbody>`,
+-   use `::before`- and `::after`-pseudo elements,
+-   increase the height of `<tbody>`'s last- and first-child,
+-   use `display: block` on `<table>` and `display: table` on `<tbody>, <tfoot>, <thead>`
+-   or use `<tfoot>` and `<thead>` as the elements whose height is changed (and which are kept in the document, no matter if they even have content).
+
+As an example, the pseudo-element approach would work e.g. like this:
 
 ```css
 tbody::before {
@@ -125,7 +130,7 @@ tbody::after {
 }
 ```
 
-Unfortunately, with these two workarounds, when scrolling down, it can happen that the table continues scrolling without user intervention (though the scrolling can be stopped manually).
+Unfortunately, with the first three workarounds, when scrolling down, it can happen that the table continues scrolling without user intervention (though the scrolling can be stopped manually).
 This is not the case when scrolling up.
 
 Some observations related to this observation:
@@ -135,7 +140,17 @@ Some observations related to this observation:
 -   scrolling up is not affected
 -   unstopped scrolling starts after removing an item from viewport
 
-In any case, as no workaround for the issues of these workarounds has been found, finally, currently, the table and tbody have `display` set to `block` and the padding is used for the scroll length.
+When the table has `display` set to `block` and the padding of the `<tbody>` is used for the scroll length, the new table (`<tbody>` with `display: table`) cannot accept a `border-collapse: collapse` style.
+
+The last method, using `<tfoot>` and `<thead>` heights too tends to jump a bit when scrolling down. Since the jumps are much smaller, you, as a user, have the choice between the two methods:
+
+You can pass the prop `requireBorderCollapse` with a value that evaluates to true if you want the method using `<tfoot>` and `<thead>` heights, and a value that evaluates to false if you want to use a table being set to `display: block` and `tbody`'s padding.
+
+```svelte
+<VirtualTable
+    requireBorderCollapse=false
+      ...
+```
 
 ## Inspiration & Compatibility
 

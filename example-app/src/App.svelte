@@ -42,6 +42,7 @@ Filter:
 {#await dataPromise}
     Loading...
 {:then}
+<!-- <p>Without border-collapse:</p>
     <VirtualTable items={filteredList} class="test1 test2" bind:start bind:end>
         <tr slot="thead">
             <th data-sort="title">Title</th>
@@ -59,7 +60,27 @@ Filter:
             <td class="td">{item.time_ago}</td>
             <td class="td">{item.comments_count}</td>
         </tr>
-    </VirtualTable>
+    </VirtualTable> -->
+
+    <p>With border-collapse:</p>
+        <VirtualTable items={filteredList} class="test1 test2" bind:start bind:end requireBorderCollapse=true>
+            <tr slot="thead">
+                <th data-sort="title">Title</th>
+                <th data-sort="user">User</th>
+                <th data-sort="domain">Domain</th>
+                <th data-sort="time" data-sort-initial="descending">Time ago</th>
+                <th data-sort="comments_count">Comments</th>
+            </tr>
+            <tr slot="tbody" let:item class="tr">
+                <td class="td"
+                    ><a href={item.url} target="_blank">{item.title}</a></td
+                >
+                <td class="td">{item.user}</td>
+                <td class="td">{item.domain}</td>
+                <td class="td">{item.time_ago}</td>
+                <td class="td">{item.comments_count}</td>
+            </tr>
+        </VirtualTable>
 {:catch error}
     <p style="color: red">{error.message}</p>
 {/await}
