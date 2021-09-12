@@ -1,6 +1,7 @@
 <script>
     // NOTE: replace the following line:
-    import VirtualTable from '../../src/VirtualTable.svelte'
+    import VirtualTable from '../../src/VirtualTable.svelte';
+
     // with:
     // import VirtualTable from 'svelte-virtual-table'
     // after installing the component using yarn/npm in your own project
@@ -49,12 +50,12 @@ Filter:
             <th data-sort="time" data-sort-initial="descending">Time ago</th>
             <th data-sort="comments_count">Comments</th>
         </tr> -->
-        <tr slot="tbody" let:item>
-            <td><a href={item.url} target="_blank">{item.title}</a></td>
-            <td>{item.user}</td>
-            <td>{item.domain}</td>
-            <td>{item.time_ago}</td>
-            <td>{item.comments_count}</td>
+        <tr slot="tbody" let:item class="tr">
+            <td class="td"><a href={item.url} target="_blank">{item.title}</a></td>
+            <td class="td">{item.user}</td>
+            <td class="td">{item.domain}</td>
+            <td class="td">{item.time_ago}</td>
+            <td class="td">{item.comments_count}</td>
         </tr>
     </VirtualTable>
 {:catch error}
@@ -78,15 +79,15 @@ Filter:
         border-bottom: 1px solid black;
     }
 
-    td:first-of-type, :global(.test1 th:first-of-type) {
+    .td:first-of-type, td:first-of-type, :global(.test1 th:first-of-type) {
         width: 50vw;
     }
 
-    td, :global(.test1 th) {
+    td, .td, :global(.test1 th) {
         width: calc((50vw-4px) / 4);
     }
 
-    td:last-of-type {
+    .td:last-of-type, td:last-of-type {
         text-align: right;
     }
 </style>

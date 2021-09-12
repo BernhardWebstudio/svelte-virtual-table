@@ -73,10 +73,11 @@
     }
 
     async function handleScroll() {
-        rows = contents.getElementsByTagName('tr')
+        rows = contents.children
         const isStartOverflow = items.length < start
 
         if (isStartOverflow) {
+            console.log("Start overflow")
             await scrollToIndex(items.length - 1, { behavior: 'auto' })
         }
 
@@ -143,9 +144,6 @@
             head_height,
             average_height
         )
-        // TODO if we overestimated the space these
-        // rows would occupy we may need to add some
-        // more. maybe we can just call handleScroll again?
     }
 
     export async function scrollToIndex(index, opts) {
@@ -232,7 +230,7 @@
     // MARK: initial triggers
     onMount(() => {
         // triggger initial refresh for virtual
-        rows = contents.getElementsByTagName('tr')
+        rows = contents.children
         mounted = true
         refreshHeightMap(items, viewport_height, itemHeight)
 
@@ -255,38 +253,6 @@
     })
 </script>
 
-<p class="debug">
-    Debug:
-    {viewport_height}, {average_height}, {height}, {top}, {bottom}
-</p>
-
-<svelte-virtual-table-viewport>
-    <table
-        class="{CLASSNAME_TABLE} {className}"
-        bind:this={viewport}
-        bind:offsetHeight={viewport_height}
-        on:scroll={handleScroll}
-        style="height: {height};"
-    >
-        <thead bind:this={thead} bind:offsetHeight={head_height}>
-            <slot name="thead" />
-        </thead>
-        <tbody
-            style="--p-top: {top}px; --p-bottom: {bottom}px;"
-            bind:this={contents}
-        >
-            {#each visible as item}
-                <slot name="tbody" item={item.data} index={item.index}
-                    >Missing Table Row</slot
-                >
-            {/each}
-        </tbody>
-        <tfoot>
-            <slot name="tfoot" />
-        </tfoot>
-    </table>
-</svelte-virtual-table-viewport>
-
 <style>
     .debug {
         display: none;
@@ -294,17 +260,20 @@
     .container {
         max-height: 100vh;
     }
-    thead :global(th.sortable) {
+    thead :global(th.sortable),
+    .thead :global(.th.sortable) {
         cursor: pointer;
         user-select: none;
         -moz-user-select: none;
         -webkit-user-select: none;
         -ms-user-select: none;
     }
-    thead :global(tr) {
+    thead :global(tr),
+    .thead :global(.tr) {
         /* position: absolute; */
     }
-    table {
+    table,
+    .table {
         position: relative;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
@@ -313,30 +282,67 @@
         box-sizing: border-box;
         /* table-layout: fixed; */
     }
-    tbody {
+    tbody,
+    .tbody {
         position: relative;
         box-sizing: border-box;
+        border: 0px solid currentColor;
+        padding-top: var(--p-top);
+        padding-bottom: var(--p-bottom);
+        display: block;
     }
-    tbody::before {
+    /* tbody::before, .tbody::before {
         box-sizing: border-box;
         content: ' ';
         display: block;
         height: var(--p-top);
     }
-    tbody::after {
+    tbody::after, .tbody::after {
         box-sizing: border-box;
         content: ' ';
         display: block;
         height: var(--p-bottom);
-    }
+    } */
     /* tbody {
         display: block;
     } */
     slot[name='tbody'],
-    tbody > :global(tr) {
+    tbody > :global(tr),
+    .tbody > :global(.tr) {
         /* height: 30px !important; */
-        overflow: hidden;
+        overflow: auto;
         /* display: block;
         min-height: 100px; */
     }
 </style>
+
+<p class="debug">
+    Debug: {viewport_height}, {average_height}, {height}, {top}, {bottom}
+</p>
+
+<svelte-virtual-table-viewport>
+    <table
+        class="{CLASSNAME_TABLE}
+        {className} table"
+        bind:this={viewport}
+        bind:offsetHeight={viewport_height}
+        on:scroll={handleScroll}
+        style="height: {height};">
+        <thead class="thead" bind:this={thead} bind:offsetHeight={head_height}>
+            <slot name="thead" />
+        </thead>
+        <tbody
+            style="--p-top: {top}px; --p-bottom: {bottom}px;"
+            bind:this={contents}
+            class="tbody">
+            {#each visible as item}
+                <slot name="tbody" item={item.data} index={item.index}>
+                    Missing Table Row
+                </slot>
+            {/each}
+        </tbody>
+        <tfoot class="tfoot">
+            <slot name="tfoot" />
+        </tfoot>
+    </table>
+</svelte-virtual-table-viewport>
