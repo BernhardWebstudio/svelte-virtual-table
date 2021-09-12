@@ -1,5 +1,5 @@
 <script>
-    const CLASSNAME_TABLE = 'tablesort'
+    const CLASSNAME_TABLE = 'tablesort' // keep same for compatibility with https://github.com/mattiash/svelte-tablesort
     const CLASSNAME_SORTABLE = 'sortable'
     const CLASSNAME_ASC = 'ascending'
     const CLASSNAME_DESC = 'descending'
@@ -93,7 +93,7 @@
         // loop items to find new start
         while (i < items.length) {
             const row_height = height_map[i] || average_height
-            if (y + row_height > scrollTop) {
+            if (y + row_height + head_height > scrollTop) {
                 new_start = i
                 top = y // + row_height
                 break
@@ -260,6 +260,11 @@
     .container {
         max-height: 100vh;
     }
+    thead, tfoot, tbody {
+        display: table;
+        table-layout: fixed;
+        width: 100%;
+    }
     thead :global(th.sortable),
     .thead :global(.th.sortable) {
         cursor: pointer;
@@ -289,8 +294,15 @@
         border: 0px solid currentColor;
         padding-top: var(--p-top);
         padding-bottom: var(--p-bottom);
-        display: block;
     }
+    /* tbody :global(> tr:first-child) {
+        height: var(--p-top);
+    }
+
+    tbody :global(> tr:last-child) {
+        height: var(--p-bottom);
+    } */
+
     /* tbody::before, .tbody::before {
         box-sizing: border-box;
         content: ' ';

@@ -3,3 +3,4 @@ src/App.svelte
 src/main.js
 rollup.config.js
 .prettierrc
+example-app/
