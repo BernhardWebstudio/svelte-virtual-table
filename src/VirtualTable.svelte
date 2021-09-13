@@ -26,34 +26,30 @@
     export let end = 0 // the index of the last visible item
 
     // local state
-    let average_height
+    let averageHeight
     let bottom = 0
     let contents
-    let head_height = 0
-    let foot_height = 0
-    let height_map = []
+    let headHeight = 0
+    let footHeight = 0
+    let heightMap = []
     let mounted
     let rows
     let thead
     let top = 0
     let viewport
-    let viewport_height = 0
+    let viewportHeight = 0
     let visible
 
-    let itemLength
-    let oldItemsLength = items.length
-
-    $: itemLength = items.length
     // whenever `items` changes, invalidate the current heightmap
-    $: if (mounted) refreshHeightMap(sortedItems, viewport_height, itemHeight)
+    $: if (mounted) refreshHeightMap(sortedItems, viewportHeight, itemHeight)
 
-    async function refreshHeightMap(items, viewport_height, itemHeight) {
+    async function refreshHeightMap(items, viewportHeight, itemHeight) {
         const { scrollTop } = viewport
         await tick() // wait until the DOM is up to date
-        let content_height = top - (scrollTop - head_height)
+        let contentHeight = top - (scrollTop - headHeight)
         let i = start
         while (
-            content_height < viewport_height - head_height &&
+            contentHeight < viewportHeight - headHeight &&
             i < items.length
         ) {
             let row = rows[i - start]
@@ -62,49 +58,92 @@
                 await tick() // render the newly visible row
                 row = rows[i - start]
             }
-            const row_height = (height_map[i] = itemHeight || row.offsetHeight)
-            content_height += row_height
+            const row_height = (heightMap[i] = itemHeight || row.getBoundingClientRect().height)
+            contentHeight += row_height
             i += 1
         }
         end = i
         const remaining = items.length - end
-        average_height = (top + content_height) / end
-        bottom = remaining * average_height + foot_height
-        height_map.length = items.length
+        averageHeight = (top + contentHeight) / end
+        bottom = remaining * averageHeight + footHeight
+        heightMap.length = items.length
         await scrollToIndex(0, { behavior: 'auto' })
+    }
+
+    function getComputedPxAmount(elem, pseudoElem, property) {
+        const compStyle = getComputedStyle(elem, pseudoElem)
+        return parseInt(compStyle[property])
     }
 
     async function handleScroll() {
         rows = contents.children
-        const isStartOverflow = items.length < start
-        const head_height_to_respect = requireBorderCollapse ? 0 : head_height
+        const isStartOverflow = sortedItems.length < start
+        const rowBottomBorder = getComputedPxAmount(
+            rows[1],
+            null,
+            'border-bottom-width'
+        )
+        const rowTopBorder = getComputedPxAmount(
+            rows[1],
+            null,
+            'border-top-width'
+        )
+        const headBorderTop = getComputedPxAmount(
+            thead,
+            null,
+            'border-top-width'
+        )
+        const headBorderBottom = getComputedPxAmount(
+            thead,
+            null,
+            'border-bottom-width'
+        )
+        const actualBorderCollapsedWidth = requireBorderCollapse ? Math.max(
+            rowBottomBorder,
+            rowTopBorder
+        ) : 0;
 
         if (isStartOverflow) {
-            console.log('Start overflow')
-            await scrollToIndex(items.length - 1, { behavior: 'auto' })
+            await scrollToIndex(sortedItems.length - 1, { behavior: 'auto' })
         }
 
         const { scrollTop } = viewport
-        const old_start = start
         let new_start = 0
         // acquire height map for currently visible rows
         for (let v = 0; v < rows.length; v += 1) {
-            height_map[start + v] = itemHeight || rows[v].offsetHeight
+            heightMap[start + v] = itemHeight || rows[v].getBoundingClientRect().height
         }
         let i = 0
-        let y = 0
+        // start from top: thead, with its borders, plus the first border to afterwards neglect
+        let y = headHeight + rowTopBorder / 2
+        let row_heights = []
         // loop items to find new start
-        while (i < items.length) {
-            const row_height = height_map[i] || average_height
-            if (y + row_height + head_height_to_respect > scrollTop) {
+        // while (y < scrollTop) {
+        //     const row_height = heightMap[i] || averageHeight
+        //     row_heights[i] = row_height
+        //     y += row_height
+        //     i += 1
+        // }
+        // top = y
+        // new_start = i
+        while (i < sortedItems.length) {
+            const row_height = heightMap[i] || averageHeight
+            row_heights[i] = row_height
+            // we only want to jump if the full (incl. border) row is away
+            if (y + row_height + actualBorderCollapsedWidth > scrollTop) {
+                // this is the last index still inside the viewport
                 new_start = i
-                top = y // + row_height
+                top =
+                    y -
+                    (requireBorderCollapse
+                        ? ((headBorderBottom + headBorderTop)/2)
+                        : (headHeight + rowTopBorder/2)) //+ rowBottomBorder - rowTopBorder
                 break
             }
             y += row_height
             i += 1
         }
-        new_start = Math.max(0, new_start)
+
         console.log(
             'a',
             i,
@@ -112,53 +151,47 @@
             top,
             bottom,
             scrollTop,
-            head_height_to_respect,
-            average_height
+            headHeight,
+            averageHeight,
+            actualBorderCollapsedWidth,
+            row_heights,
+            heightMap
         )
+        new_start = Math.max(0, new_start)
         // loop items to find end
-        while (i < items.length) {
-            y += height_map[i] || average_height
+        while (i < sortedItems.length) {
+            const row_height = heightMap[i] || averageHeight
+            y += row_height
             i += 1
-            if (y > scrollTop + viewport_height - head_height_to_respect) {
+            if (y > scrollTop + viewportHeight) {
                 break
             }
         }
         start = new_start
         end = i
-        const remaining = items.length - end
+        const remaining = sortedItems.length - end
         if (end === 0) {
-            end = 10;
+            end = 10
         }
-        average_height = y / end
-        let remaining_height = remaining * average_height // 0
+        averageHeight = y / end
+        let remaining_height = remaining * averageHeight // 0
         // compute height map for remaining items
-        while (i < items.length) {
+        while (i < sortedItems.length) {
             i += 1
-            height_map[i] = height_map[i] || average_height
-            // remaining_height += height_map[i] / remaining
+            heightMap[i] = averageHeight
+            // remaining_height += heightMap[i] / remaining
         }
         // find the
         bottom = remaining_height
         if (!isFinite(bottom)) {
             bottom = 200000
         }
-
-        console.log(
-            'b',
-            i,
-            y,
-            top,
-            bottom,
-            scrollTop,
-            head_height,
-            average_height
-        )
     }
 
     export async function scrollToIndex(index, opts) {
         const { scrollTop } = viewport
         const itemsDelta = index - start
-        const _itemHeight = itemHeight || average_height
+        const _itemHeight = itemHeight || averageHeight
         const distance = itemsDelta * _itemHeight
         opts = {
             left: 0,
@@ -176,7 +209,7 @@
     $: sortedItems = sorted([...items], sortOrder)
 
     $: visible = sortedItems
-        .slice(Math.max(0, start - 5), Math.min(sortedItems.length, end + 3)) // start, end) // 
+        .slice(start, end) // Math.max(0, start - 5), Math.min(sortedItems.length, end + 3)) // start, end) //
         .map((data, i) => {
             return { index: i + start, data }
         })
@@ -241,7 +274,7 @@
         // triggger initial refresh for virtual
         rows = contents.children
         mounted = true
-        refreshHeightMap(items, viewport_height, itemHeight)
+        refreshHeightMap(items, viewportHeight, itemHeight)
 
         // prepare sorting
         const th = thead.getElementsByTagName('th')
@@ -262,47 +295,39 @@
     })
 </script>
 
-<p class="debug">
-    Debug: {viewport_height}, {average_height}, {height}, {top}, {bottom}
-</p>
-
 <svelte-virtual-table-viewport>
     <table
         class:require-border-collapse={requireBorderCollapse}
         class="{CLASSNAME_TABLE}
         {className} table"
         bind:this={viewport}
-        bind:offsetHeight={viewport_height}
+        bind:offsetHeight={viewportHeight}
         on:scroll={handleScroll}
-        style="height: {height}; --p-top: {top}px; --p-bottom: {bottom}px; --head-height: {head_height}px; --foot-height: {foot_height}px"
+        role="table"
+        style="height: {height}; --bw-svt-p-top: {top}px; --bw-svt-p-bottom: {bottom}px; --bw-svt-head-height: {headHeight}px; --bw-svt-foot-height: {footHeight}px; --bw-svt-avg-row-height: {averageHeight}px"
     >
-        <thead class="thead" bind:this={thead} bind:offsetHeight={head_height}>
+        <thead
+            class="thead"
+            role="rowgroup"
+            bind:this={thead}
+            bind:offsetHeight={headHeight}
+        >
             <slot name="thead" />
         </thead>
-        <tbody
-            style="--p-top: {top}px; --p-bottom: {bottom}px;"
-            bind:this={contents}
-            class="tbody"
-        >
+        <tbody bind:this={contents} class="tbody" role="rowgroup">
             {#each visible as item}
                 <slot name="tbody" item={item.data} index={item.index}>
                     Missing Table Row
                 </slot>
             {/each}
         </tbody>
-        <tfoot class="tfoot" bind:offsetHeight={foot_height}>
+        <tfoot class="tfoot" bind:offsetHeight={footHeight} role="rowgroup">
             <slot name="tfoot" />
         </tfoot>
     </table>
 </svelte-virtual-table-viewport>
 
 <style type="text/css">
-    .debug {
-        display: block;
-    }
-    .container {
-        max-height: 100vh;
-    }
     table,
     .table {
         position: relative;
@@ -310,28 +335,27 @@
         -webkit-overflow-scrolling: touch;
         max-height: 100vh;
         box-sizing: border-box;
+        display: block;
         /* table-layout: fixed; */
     }
-    table:not(.require-border-collapse) {
-        display: block;
-    }
-    table:not(.require-border-collapse) :is(thead, tfoot, tbody) {
+    table :is(thead, tfoot, tbody) {
         display: table;
         table-layout: fixed;
         width: 100%;
+        box-sizing: border-box;
     }
     table.require-border-collapse thead {
-        padding-top: var(--p-top);
+        min-height: calc(var(--bw-svt-p-top));
     }
     table.require-border-collapse tfoot {
-        padding-bottom: var(--p-bottom);
+        min-height: calc(var(--bw-svt-p-bottom));
     }
     table.require-border-collapse {
         border-collapse: collapse;
     }
     table:not(.require-border-collapse) tbody {
-        padding-top: var(--p-top);
-        padding-bottom: var(--p-bottom);
+        padding-top: var(--bw-svt-p-top);
+        padding-bottom: var(--bw-svt-p-bottom);
     }
     tbody {
         position: relative;
