@@ -136,19 +136,19 @@
             i += 1
         }
 
-        console.log(
-            'a',
-            i,
-            y,
-            top,
-            bottom,
-            scrollTop,
-            headHeight,
-            averageHeight,
-            actualBorderCollapsedWidth,
-            row_heights,
-            heightMap
-        )
+        // console.log(
+        //     'a',
+        //     i,
+        //     y,
+        //     top,
+        //     bottom,
+        //     scrollTop,
+        //     headHeight,
+        //     averageHeight,
+        //     actualBorderCollapsedWidth,
+        //     row_heights,
+        //     heightMap
+        // )
         new_start = Math.max(0, new_start)
         // loop items to find end
         while (i < sortedItems.length) {
