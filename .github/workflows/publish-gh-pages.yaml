@@ -18,15 +18,14 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 15
-      
-      - name: Switch to example-app directory
-        run: cd ./example-app || ls; pwd
 
       - name: Get yarn cache directory path
+        working-directory: ./example-app
         id: yarn-cache-dir
         run: echo "::set-output name=dir::$(yarn cache dir)"
 
       - name: Cache yarn dependencies
+        working-directory: ./example-app
         uses: actions/cache@v1
         id: yarn-cache
         with:
@@ -37,15 +36,18 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Install yarn dependencies
+        working-directory: ./example-app
         # as we allow any keys we have to run the installer anyway
         # if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn install
 
       - name: Run Build
+        working-directory: ./example-app
         run: yarn run build
       
       - name: Upload Build
         uses: JamesIves/github-pages-deploy-action@4.0.0
+        working-directory: ./example-app
         with:
           branch: gh-pages # The branch the action should deploy to.
           folder: ./public/ # The folder the action should deploy.
