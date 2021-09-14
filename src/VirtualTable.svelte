@@ -18,8 +18,8 @@
     export { className as class }
 
     // MARK: virtual stuff
-    export let height = '100%'
-    export let itemHeight = undefined
+    export let height = '100%' // the height of the viewport/table
+    export let itemHeight = undefined // the height of each row
 
     // read-only, but visible to consumers via bind:start resp. bind:end
     export let start = 0 // the index of the first visible item
@@ -118,14 +118,6 @@
         let y = headHeight + rowTopBorder / 2
         let row_heights = []
         // loop items to find new start
-        // while (y < scrollTop) {
-        //     const row_height = heightMap[i] || averageHeight
-        //     row_heights[i] = row_height
-        //     y += row_height
-        //     i += 1
-        // }
-        // top = y
-        // new_start = i
         while (i < sortedItems.length) {
             const row_height = heightMap[i] || averageHeight
             row_heights[i] = row_height
@@ -203,13 +195,12 @@
     }
 
     // MARK: table sort stuff
-    // let thead
     let sortOrder = [[]]
 
     $: sortedItems = sorted([...items], sortOrder)
 
     $: visible = sortedItems
-        .slice(start, end) // Math.max(0, start - 5), Math.min(sortedItems.length, end + 3)) // start, end) //
+        .slice(start, end)
         .map((data, i) => {
             return { index: i + start, data }
         })
@@ -328,8 +319,7 @@
 </svelte-virtual-table-viewport>
 
 <style type="text/css">
-    table,
-    .table {
+    table {
         position: relative;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
@@ -364,8 +354,7 @@
     }
 
     /** sortable styles */
-    thead :global(th.sortable),
-    .thead :global(.th.sortable) {
+    thead :global(th.sortable) {
         cursor: pointer;
         user-select: none;
         -moz-user-select: none;
