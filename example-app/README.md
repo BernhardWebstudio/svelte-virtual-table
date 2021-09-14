@@ -1,5 +1,7 @@
 # Example App for Svelte-Virtual-Table
 
+This example app is published here: [bernhardwebstudio.github.io/svelte-virtual-table/](https://bernhardwebstudio.github.io/svelte-virtual-table/).
+
 ## Get started (DEV)
 
 Install the dependencies...

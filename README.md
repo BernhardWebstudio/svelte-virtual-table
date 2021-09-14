@@ -1,6 +1,7 @@
 # Svelte: Virtual Table
 
 A sortable, virtual table for Svelte.
+Example App is available here: [bernhardwebstudio.github.io/svelte-virtual-table/](https://bernhardwebstudio.github.io/svelte-virtual-table/).
 
 - [Svelte: Virtual Table](#svelte-virtual-table)
   - [Installation](#installation)
