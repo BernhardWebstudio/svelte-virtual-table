@@ -1,5 +1,5 @@
 import VirtualTable from './VirtualTable.svelte'
 
-export {
+export default {
     VirtualTable
 }
