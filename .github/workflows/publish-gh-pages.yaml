@@ -20,7 +20,7 @@ jobs:
           node-version: 15
       
       - name: Switch to example-app directory
-        run: cd ./example-app
+        run: cd ./example-app || ls; pwd
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir
