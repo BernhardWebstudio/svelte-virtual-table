@@ -39,6 +39,11 @@ jobs:
             - name: Install yarn dependencies
               # as we allow any keys we have to run the installer anyway
               # if: steps.yarn-cache.outputs.cache-hit != 'true'
+              run: cd ..; yarn install
+
+            - name: Install yarn dependencies
+              # as we allow any keys we have to run the installer anyway
+              # if: steps.yarn-cache.outputs.cache-hit != 'true'
               run: yarn install
 
             - name: Run Build
