@@ -1,10 +1,6 @@
 <script>
-    // NOTE: replace the following line:
-    import VirtualTable from '../../src/VirtualTable.svelte'
+    import VirtualTable from 'svelte-virtual-table'
 
-    // with:
-    // import VirtualTable from 'svelte-virtual-table'
-    // after installing the component using yarn/npm in your own project
     let items = []
     async function getData() {
         let dataItems = []
