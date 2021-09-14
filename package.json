@@ -1,6 +1,6 @@
 {
   "name": "svelte-virtual-table",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A virtual, sortable table for Svelte",
   "svelte": "src/index.js",
   "module": "dist/index.mjs",
