@@ -1,4 +1,5 @@
 <script>
+    // import VirtualTable from '../../src/index'
     import VirtualTable from 'svelte-virtual-table'
 
     let items = []
