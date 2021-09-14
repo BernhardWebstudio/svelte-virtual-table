@@ -1,53 +1,51 @@
 name: Publish Example App
 
 on:
-  push:
-    branches:
-      - master
-      - main
+    push:
+        branches:
+            - master
+            - main
 
 jobs:
-  build-deploy:
-    runs-on: ubuntu-latest
+    build-deploy:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: ./example-app
 
-    name: Publish Example Website to GitHub Pages
-    steps:
-      - uses: actions/checkout@v2
+        name: Publish Example Website to GitHub Pages
+        steps:
+            - uses: actions/checkout@v2
 
-      - name: Setup Node
-        uses: actions/setup-node@v2
-        with:
-          node-version: 15
+            - name: Setup Node
+              uses: actions/setup-node@v2
+              with:
+                  node-version: 15
 
-      - name: Get yarn cache directory path
-        working-directory: ./example-app
-        id: yarn-cache-dir
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+            - name: Get yarn cache directory path
+              id: yarn-cache-dir
+              run: echo "::set-output name=dir::$(yarn cache dir)"
 
-      - name: Cache yarn dependencies
-        working-directory: ./example-app
-        uses: actions/cache@v1
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-            ${{ runner.os }}-yarn-
+            - name: Cache yarn dependencies
+              uses: actions/cache@v1
+              id: yarn-cache
+              with:
+                  path: ${{ steps.yarn-cache-dir.outputs.dir }}
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                      ${{ runner.os }}-yarn-
 
-      - name: Install yarn dependencies
-        working-directory: ./example-app
-        # as we allow any keys we have to run the installer anyway
-        # if: steps.yarn-cache.outputs.cache-hit != 'true'
-        run: yarn install
+            - name: Install yarn dependencies
+              # as we allow any keys we have to run the installer anyway
+              # if: steps.yarn-cache.outputs.cache-hit != 'true'
+              run: yarn install
 
-      - name: Run Build
-        working-directory: ./example-app
-        run: yarn run build
-      
-      - name: Upload Build
-        uses: JamesIves/github-pages-deploy-action@4.0.0
-        working-directory: ./example-app
-        with:
-          branch: gh-pages # The branch the action should deploy to.
-          folder: ./public/ # The folder the action should deploy.
+            - name: Run Build
+              run: yarn run build
+
+            - name: Upload Build
+              uses: JamesIves/github-pages-deploy-action@4.0.0
+              with:
+                  branch: gh-pages # The branch the action should deploy to.
+                  folder: ./example-app/public/ # The folder the action should deploy.
