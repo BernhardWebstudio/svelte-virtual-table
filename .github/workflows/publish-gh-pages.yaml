@@ -15,19 +15,19 @@ jobs:
 
         name: Publish Example Website to GitHub Pages
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
 
             - name: Setup Node
-              uses: actions/setup-node@v2
+              uses: actions/setup-node@v4
               with:
-                  node-version: 15
+                  node-version: 20
 
             - name: Get yarn cache directory path
               id: yarn-cache-dir
               run: echo "::set-output name=dir::$(yarn cache dir)"
 
             - name: Cache yarn dependencies
-              uses: actions/cache@v1
+              uses: actions/cache@v3
               id: yarn-cache
               with:
                   path: ${{ steps.yarn-cache-dir.outputs.dir }}
@@ -50,7 +50,7 @@ jobs:
               run: yarn run build
 
             - name: Upload Build
-              uses: JamesIves/github-pages-deploy-action@4.0.0
+              uses: JamesIves/github-pages-deploy-action@v4.4.3
               with:
                   branch: gh-pages # The branch the action should deploy to.
                   folder: ./example-app/public/ # The folder the action should deploy.

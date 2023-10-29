@@ -11,6 +11,7 @@
     "email": "tim@bernhard-webstudio.ch",
     "url": "https://bernhard-webstudio.ch"
   },
+  "type": "module",
   "license": "MIT",
   "private": false,
   "devDependencies": {
