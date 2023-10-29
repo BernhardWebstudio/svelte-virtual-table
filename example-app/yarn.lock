@@ -376,11 +376,6 @@ function-bind@^1.1.2:
   resolved "https://registry.yarnpkg.com/function-bind/-/function-bind-1.1.2.tgz#2c02d864d97f3ea6c8830c464cbd11ab6eab7a1c"
   integrity sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==
 
-generator-sort@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/generator-sort/-/generator-sort-1.0.0.tgz#ac5b90297c2bb1876bb0ed167225de1780c3213b"
-  integrity sha512-xzVvVuMrRvINjet6x7Hlv4fbupUBuswkefe62YRejY1olzpdRNdTX655jw30ELgm5UJOMzZRoPlmVXVS0GFADQ==
-
 get-port@^3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/get-port/-/get-port-3.2.0.tgz#dd7ce7de187c06c8bf353796ac71e099f0980ebc"
@@ -778,12 +773,10 @@ supports-preserve-symlinks-flag@^1.0.0:
   resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
 
-svelte-virtual-table@^1.0.0:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/svelte-virtual-table/-/svelte-virtual-table-1.0.4.tgz#4a031b01ac0d4595539fe301170131fcafddbb7b"
-  integrity sha512-iLKE4ZyGH8dkwj5ikahamRITB3N/EkelMo0B3rLSPv+s2NqMLzoj+sIFbpR+uHyMRICtAv8yUfv0Bv4aNEVbJw==
-  dependencies:
-    generator-sort "^1.0.0"
+svelte-virtual-table@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/svelte-virtual-table/-/svelte-virtual-table-1.1.1.tgz#e3d1b958cf1bfe27c57063fb0af45848507eecf8"
+  integrity sha512-sEYqOwAV/a1guzg7/uVlXkF15uHSiE68k+OB5d8wlSugVp+wZ+3sHZGQTsMar9X5Tcr9Yk60Qe+dKb2727/amg==
 
 svelte@^4.2.2:
   version "4.2.2"
