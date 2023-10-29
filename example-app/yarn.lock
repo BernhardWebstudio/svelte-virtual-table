@@ -773,10 +773,10 @@ supports-preserve-symlinks-flag@^1.0.0:
   resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
 
-svelte-virtual-table@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/svelte-virtual-table/-/svelte-virtual-table-1.1.1.tgz#e3d1b958cf1bfe27c57063fb0af45848507eecf8"
-  integrity sha512-sEYqOwAV/a1guzg7/uVlXkF15uHSiE68k+OB5d8wlSugVp+wZ+3sHZGQTsMar9X5Tcr9Yk60Qe+dKb2727/amg==
+svelte-virtual-table@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/svelte-virtual-table/-/svelte-virtual-table-1.1.2.tgz#3ef4451ac7148f41decc3326bb46350598864a57"
+  integrity sha512-4KmxGWkuma44bYSYEBiBJhcG0x3Jw67V+wlLF85psagCWMQyfDMSQHWPpFdlx4F0kIKQvB+vI7u4cbY99sBwYA==
 
 svelte@^4.2.2:
   version "4.2.2"
