@@ -35,6 +35,12 @@
     "dist"
   ],
   "dependencies": {
+    "@types/node": "^20.8.9",
     "generator-sort": "^1.0.0"
+  },
+  "exports": {
+    ".": {
+      "svelte": "./src/VirtualTable.svelte"
+    }
   }
 }
