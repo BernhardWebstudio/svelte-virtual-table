@@ -4,11 +4,6 @@
     const CLASSNAME_ASC = 'ascending'
     const CLASSNAME_DESC = 'descending'
 
-    import {
-        compareNumbers,
-        compareStrings,
-        sortFunction,
-    } from 'generator-sort'
     import { onMount, tick } from 'svelte'
 
     // props
@@ -58,7 +53,8 @@
                 await tick() // render the newly visible row
                 row = rows[i - start]
             }
-            const row_height = (heightMap[i] = itemHeight || row.getBoundingClientRect().height)
+            const row_height = (heightMap[i] =
+                itemHeight || row.getBoundingClientRect().height)
             contentHeight += row_height
             i += 1
         }
@@ -98,10 +94,9 @@
             null,
             'border-bottom-width'
         )
-        const actualBorderCollapsedWidth = requireBorderCollapse ? Math.max(
-            rowBottomBorder,
-            rowTopBorder
-        ) : 0;
+        const actualBorderCollapsedWidth = requireBorderCollapse
+            ? Math.max(rowBottomBorder, rowTopBorder)
+            : 0
 
         if (isStartOverflow) {
             await scrollToIndex(sortedItems.length - 1, { behavior: 'auto' })
@@ -111,7 +106,8 @@
         let new_start = 0
         // acquire height map for currently visible rows
         for (let v = 0; v < rows.length; v += 1) {
-            heightMap[start + v] = itemHeight || rows[v].getBoundingClientRect().height
+            heightMap[start + v] =
+                itemHeight || rows[v].getBoundingClientRect().height
         }
         let i = 0
         // start from top: thead, with its borders, plus the first border to afterwards neglect
@@ -128,8 +124,8 @@
                 top =
                     y -
                     (requireBorderCollapse
-                        ? ((headBorderBottom + headBorderTop)/2)
-                        : (headHeight + rowTopBorder/2)) //+ rowBottomBorder - rowTopBorder
+                        ? (headBorderBottom + headBorderTop) / 2
+                        : headHeight + rowTopBorder / 2) //+ rowBottomBorder - rowTopBorder
                 break
             }
             y += row_height
@@ -199,27 +195,27 @@
 
     $: sortedItems = sorted([...items], sortOrder)
 
-    $: visible = sortedItems
-        .slice(start, end)
-        .map((data, i) => {
-            return { index: i + start, data }
-        })
+    $: visible = sortedItems.slice(start, end).map((data, i) => {
+        return { index: i + start, data }
+    })
 
     const sorted = function (arr, sortOrder) {
-        arr.sort(
-            sortFunction(function* (a, b) {
-                for (let [fieldName, r] of sortOrder) {
-                    const reverse = r === 0 ? 1 : -1
-                    if (typeof a[fieldName] === 'number') {
-                        yield reverse *
-                            compareNumbers(a[fieldName], b[fieldName])
-                    } else {
-                        yield reverse *
-                            compareStrings(a[fieldName], b[fieldName])
-                    }
+        const reverse = r === 0 ? 1 : -1
+        arr.sort((a, b) => {
+            for (let [fieldName, r] of sortOrder) {
+                let comparison = 0
+                if (typeof a[fieldName] === 'number') {
+                    comparison = reverse * (a[fieldName] - b[fieldName])
+                } else {
+                    comparison =
+                        reverse * a[fieldName].localeCompare(b[fieldName])
                 }
-            })
-        )
+                if (comparison) {
+                    return comparison
+                }
+            }
+            return 0
+        })
 
         return arr
     }

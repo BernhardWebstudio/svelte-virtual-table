@@ -1,6 +1,6 @@
 {
   "name": "svelte-virtual-table",
-  "version": "1.0.4",
+  "version": "1.1.1",
   "description": "A virtual, sortable table for Svelte",
   "svelte": "src/index.js",
   "module": "dist/index.mjs",
@@ -35,8 +35,6 @@
     "dist"
   ],
   "dependencies": {
-    "@types/node": "^20.8.9",
-    "generator-sort": "^1.0.0"
   },
   "exports": {
     ".": {
