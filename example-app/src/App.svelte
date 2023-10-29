@@ -1,6 +1,6 @@
 <script>
-    // import VirtualTable from '../../src/index'
-    import VirtualTable from 'svelte-virtual-table'
+    import VirtualTable from '../../src/index'
+    // import VirtualTable from 'svelte-virtual-table'
 
     let items = []
     async function getData() {

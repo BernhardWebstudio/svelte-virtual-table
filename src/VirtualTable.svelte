@@ -203,12 +203,18 @@
         arr.sort((a, b) => {
             for (let [fieldName, r] of sortOrder) {
                 const reverse = r === 0 ? 1 : -1
+                if (fieldName in b && !(fieldName in a)) {
+                    return -1 * reverse
+                }
+                if (!(fieldName in b) && fieldName in a) {
+                    return 1 * reverse
+                }
                 let comparison = 0
-                if (typeof a[fieldName] === 'number') {
-                    comparison = reverse * (a[fieldName] - b[fieldName])
-                } else {
+                if (typeof a[fieldName] === 'string') {
                     comparison =
                         reverse * a[fieldName].localeCompare(b[fieldName])
+                } else if (a[fieldName] != b[fieldName]) {
+                    comparison = reverse*(a[fieldName] > b[fieldName] ? 1 : -1);
                 }
                 if (comparison) {
                     return comparison
