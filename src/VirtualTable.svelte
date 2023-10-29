@@ -200,9 +200,9 @@
     })
 
     const sorted = function (arr, sortOrder) {
-        const reverse = r === 0 ? 1 : -1
         arr.sort((a, b) => {
             for (let [fieldName, r] of sortOrder) {
+                const reverse = r === 0 ? 1 : -1
                 let comparison = 0
                 if (typeof a[fieldName] === 'number') {
                     comparison = reverse * (a[fieldName] - b[fieldName])
