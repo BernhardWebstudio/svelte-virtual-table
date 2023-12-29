@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="/svelte-virtual-table/favicon.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		
+		<link rel="modulepreload" href="/svelte-virtual-table/_app/immutable/entry/start.XMbFiIeH.js">
+		<link rel="modulepreload" href="/svelte-virtual-table/_app/immutable/chunks/scheduler.8SKSgLkL.js">
+		<link rel="modulepreload" href="/svelte-virtual-table/_app/immutable/chunks/singletons.oF_LUTSC.js">
+		<link rel="modulepreload" href="/svelte-virtual-table/_app/immutable/entry/app.hWp7Efm5.js">
+		<link rel="modulepreload" href="/svelte-virtual-table/_app/immutable/chunks/index.ozCDKuL1.js">
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div>
+			<script>
+				{
+					__sveltekit_d3k4rd = {
+						assets: "/svelte-virtual-table",
+						base: "/svelte-virtual-table",
+						env: null
+					};
+
+					const element = document.currentScript.parentElement;
+
+					Promise.all([
+						import("/svelte-virtual-table/_app/immutable/entry/start.XMbFiIeH.js"),
+						import("/svelte-virtual-table/_app/immutable/entry/app.hWp7Efm5.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element);
+					});
+				}
+			</script>
+		</div>
+	</body>
+</html>
