@@ -1,6 +1,20 @@
 {
-	"name": "svelte-virtual-table-2",
-	"version": "0.0.1",
+	"name": "svelte-virtual-table",
+	"version": "2.0.0",
+	"repository": "github.com/BernhardWebstudio/SvelteVirtualTable",
+	"author": {
+		"name": "Tim Bernhard",
+		"email": "tim@bernhard-webstudio.ch",
+		"url": "https://bernhard-webstudio.ch"
+	},
+	"license": "MIT",
+	"private": false,
+	"keywords": [
+		"svelte",
+		"table",
+		"virtual",
+		"component"
+	],
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run package",
