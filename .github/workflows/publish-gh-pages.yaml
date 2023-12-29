@@ -9,9 +9,6 @@ on:
 jobs:
     build_site:
         runs-on: ubuntu-latest
-        defaults:
-            run:
-                working-directory: ./example-app
 
         name: Publish Example Website to GitHub Pages
         steps:
