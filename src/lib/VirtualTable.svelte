@@ -1,4 +1,6 @@
 <script>
+    export const ssr = false
+    
     const CLASSNAME_TABLE = 'tablesort' // keep same for compatibility with https://github.com/mattiash/svelte-tablesort
     const CLASSNAME_SORTABLE = 'sortable'
     const CLASSNAME_ASC = 'ascending'
