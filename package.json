@@ -1,7 +1,10 @@
 {
 	"name": "svelte-virtual-table",
 	"version": "2.0.0",
-	"repository": "github.com/BernhardWebstudio/SvelteVirtualTable",
+	"repository": {
+		"type": "git",
+		"url": "github.com/BernhardWebstudio/SvelteVirtualTable"
+	},
 	"author": {
 		"name": "Tim Bernhard",
 		"email": "tim@bernhard-webstudio.ch",
