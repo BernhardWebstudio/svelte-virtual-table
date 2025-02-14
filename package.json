@@ -3,7 +3,7 @@
 	"version": "2.0.0",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/BernhardWebstudio/SvelteVirtualTable"
+		"url": "git+https://github.com/BernhardWebstudio/SvelteVirtualTable.git"
 	},
 	"author": {
 		"name": "Tim Bernhard",
@@ -43,7 +43,7 @@
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^4.0.0",
-		"@sveltejs/adapter-static": "^3.0.1",
+		"@sveltejs/adapter-static": "^3.0.8",
 		"@sveltejs/kit": "^2.5.27",
 		"@sveltejs/package": "^2.3.7",
 		"@sveltejs/vite-plugin-svelte": "^5.0.3",
