@@ -29,7 +29,7 @@ jobs:
               run: npm run build
 
             - name: Upload Build
-              uses: JamesIves/github-pages-deploy-action@v4.5.0
+              uses: JamesIves/github-pages-deploy-action@v4.7.2
               with:
+                  folder: build # The folder the action should deploy.
                   branch: gh-pages # The branch the action should deploy to.
-                  folder: ./build/ # The folder the action should deploy.
