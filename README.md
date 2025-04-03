@@ -31,67 +31,64 @@ npm install svelte-virtual-table
 You can then, after the installation, import it in your app:
 
 ```js
-import VirtualTable from 'svelte-virtual-table'
+import VirtualTable from 'svelte-virtual-table';
 ```
 
 and use it, for example like so:
 
 ```js
-let myItemsArray = []
+let myItemsArray = [];
 
 async function getData() {
-    let dataItems = []
-    for (let page = 1; page < 5; page++) {
-        let res = await fetch(
-            `https://node-hnapi.herokuapp.com/news?page=${page}`
-        )
-        let data = await res.json()
-        dataItems = dataItems.concat(data)
-    }
-    items = dataItems
-    return items
+	let dataItems = [];
+	for (let page = 1; page < 5; page++) {
+		let res = await fetch(`https://node-hnapi.herokuapp.com/news?page=${page}`);
+		let data = await res.json();
+		dataItems = dataItems.concat(data);
+	}
+	items = dataItems;
+	return items;
 }
 
-const dataPromise = getData()
+const dataPromise = getData();
 
 // TWO variables that can be bound to the VirtualTable
-let start // the index of the first visible item
-let end // the index of the last visible item
+let start; // the index of the first visible item
+let end; // the index of the last visible item
 ```
 
 ```svelte
 {#await dataPromise}
-    Loading...
+	Loading...
 {:then}
-    <VirtualTable
-        items={myItemsArray}
-        class="anyClassIWantToAdd"
-        bind:start
-        bind:end
-    >
-        <tr slot="thead" role="row">
-            <th data-sort="title">Title</th>
-            <th data-sort="user">User</th>
-            <th data-sort="domain">Domain</th>
-            <th data-sort="time" data-sort-initial="descending">Time ago</th>
-            <th data-sort="comments_count">Comments</th>
-        </tr>
-        <tr slot="tbody" role="row" let:item>
-            <td>
-                <a href={item.url} target="_blank">{item.title}</a>
-            </td>
-            <td>{item.user}</td>
-            <td>{item.domain}</td>
-            <td>{item.time_ago}</td>
-            <td>{item.comments_count}</td>
-        </tr>
-    </VirtualTable>
+	<VirtualTable items={myItemsArray} class="anyClassIWantToAdd" bind:start bind:end>
+		{#snippet thead()}
+			<tr>
+				<th data-sort="title">Title</th>
+				<th data-sort="user">User</th>
+				<th data-sort="domain">Domain</th>
+				<th data-sort="time" data-sort-initial="descending">Time ago</th>
+				<th data-sort="comments_count">Comments</th>
+			</tr>
+		{/snippet}
+		{#snippet trow(item)}
+			<tr>
+				<td>
+					<a href={item.url} target="_blank">{item.title}</a>
+				</td>
+				<td>{item.user}</td>
+				<td>{item.domain}</td>
+				<td>{item.time_ago}</td>
+				<td>{item.comments_count}</td>
+			</tr>
+		{/snippet}
+	</VirtualTable>
 {:catch error}
-    <p style="color: red">{error.message}</p>
+	<p style="color: red">{error.message}</p>
 {/await}
 ```
 
-Pay attention to the `role` attributes: those are highly recommended if you want to have the table behave as such also in accessibility contexts. 
+Pay attention to the `role` attributes: those are highly recommended if you want to have the table behave as such also in accessibility contexts.
 While this is not necessarily needed for ordinary tables, this one is required to use `display: block` on the table element (see Development Notes](#development-notes)), which in turn makes these role attributes necessary, still.
 
 You can find an example-app in the [GitHub Repo](https://github.com/BernhardWebstudio/svelte-virtual-table/tree/main/example-app).
@@ -113,26 +110,26 @@ As these are not block-type elements, the original intention to use padding as a
 
 There are numerous workarounds, that were attempted:
 
--   apply a border to `<tbody>`,
--   use `::before`- and `::after`-pseudo elements,
--   increase the height of `<tbody>`'s last- and first-child,
--   use `display: block` on `<table>` and `display: table` on `<tbody>, <tfoot>, <thead>`
--   or use `<tfoot>` and `<thead>` as the elements whose height is changed (and which are kept in the document, no matter if they even have content).
+- apply a border to `<tbody>`,
+- use `::before`- and `::after`-pseudo elements,
+- increase the height of `<tbody>`'s last- and first-child,
+- use `display: block` on `<table>` and `display: table` on `<tbody>, <tfoot>, <thead>`
+- or use `<tfoot>` and `<thead>` as the elements whose height is changed (and which are kept in the document, no matter if they even have content).
 
 As an example, the pseudo-element approach would work e.g. like this:
 
 ```css
 tbody::before {
-    box-sizing: border-box;
-    content: ' ';
-    display: block;
-    height: var(--p-top);
+	box-sizing: border-box;
+	content: ' ';
+	display: block;
+	height: var(--p-top);
 }
 tbody::after {
-    box-sizing: border-box;
-    content: ' ';
-    display: block;
-    height: var(--p-bottom);
+	box-sizing: border-box;
+	content: ' ';
+	display: block;
+	height: var(--p-bottom);
 }
 ```
 
@@ -141,10 +138,10 @@ This is not the case when scrolling up.
 
 Some observations related to this problem:
 
--   scrollTop increases with the --p-top
--   changing --p-top and --p-bottom triggers a scroll event
--   scrolling up is not affected
--   unstopped scrolling starts after removing an item from viewport
+- scrollTop increases with the --p-top
+- changing --p-top and --p-bottom triggers a scroll event
+- scrolling up is not affected
+- unstopped scrolling starts after removing an item from viewport
 
 The reason is with high probability, that the current calculations are incorrect. Refer to [this codepen](https://codepen.io/BernhardWebstudio/pen/NWggLyG) for some calculation-analysis possibilities.
 
@@ -164,8 +161,6 @@ You can pass the prop `requireBorderCollapse` with a value that evaluates to tru
 
 ## Inspiration/Compatibility
 
--   https://svelte.dev/repl/a138b0c8579b4fc8bdde842a9d922b1f?version=3.17.1
--   https://github.com/mattiash/svelte-tablesort
--   https://github.com/sveltejs/svelte-virtual-list
-
-
+- https://svelte.dev/repl/a138b0c8579b4fc8bdde842a9d922b1f?version=3.17.1
+- https://github.com/mattiash/svelte-tablesort
+- https://github.com/sveltejs/svelte-virtual-list

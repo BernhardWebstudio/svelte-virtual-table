@@ -3,7 +3,7 @@
 	import VirtualTable from '../lib/index';
 	// import VirtualTable from 'svelte-virtual-table'
 
-	let items = [];
+	let items = $state([]);
 	async function getData() {
 		let dataItems = [];
 		for (let page = 1; page < 5; page++) {
@@ -17,14 +17,16 @@
 
 	const dataPromise = getData();
 
-	let searchTerm = '';
+	let searchTerm = $state('');
 
-	$: filteredList = items.filter(
-		(item) => item.title.toUpperCase().indexOf(searchTerm.toUpperCase()) !== -1
+	let filteredList = $derived(
+		items.filter((item) => item.title.toUpperCase().indexOf(searchTerm.toUpperCase()) !== -1)
 	);
 
-	let start, start2;
-	let end, end2;
+	let start = $state(0),
+		start2 = $state(0);
+	let end = $state(10),
+		end2 = $state(10);
 </script>
 
 <h1>Virtual Table Test</h1>
@@ -44,26 +46,30 @@ Filter:
 	Loading...
 {:then}
 	<p>Loaded {filteredList.length} items.</p>
-	<p>Without border-collapse:</p>
+	<h3>Without border-collapse:</h3>
 	<p>Start: {start}, end: {end}</p>
 	<VirtualTable items={filteredList} class="test1 test2" bind:start bind:end>
-		<tr slot="thead">
-			<th data-sort="title">Title</th>
-			<th data-sort="user">User</th>
-			<th data-sort="domain">Domain</th>
-			<th data-sort="time" data-sort-initial="descending">Time ago</th>
-			<th data-sort="comments_count">Comments</th>
-		</tr>
-		<tr slot="tbody" let:item class="tr">
-			<td class="td"><a href={item.url} target="_blank">{item.title}</a></td>
-			<td class="td">{item.user}</td>
-			<td class="td">{item.domain}</td>
-			<td class="td">{item.time_ago}</td>
-			<td class="td">{item.comments_count}</td>
-		</tr>
+		{#snippet thead()}
+			<tr>
+				<th data-sort="title">Title</th>
+				<th data-sort="user">User</th>
+				<th data-sort="domain">Domain</th>
+				<th data-sort="time" data-sort-initial="descending">Time ago</th>
+				<th data-sort="comments_count">Comments</th>
+			</tr>
+		{/snippet}
+		{#snippet trow(item, index)}
+			<tr class="tr">
+				<td class="td"><a href={item.url} target="_blank">{item.title}</a></td>
+				<td class="td">{item.user}</td>
+				<td class="td">{item.domain}</td>
+				<td class="td">{item.time_ago}</td>
+				<td class="td">{item.comments_count}</td>
+			</tr>
+		{/snippet}
 	</VirtualTable>
 
-	<p>With border-collapse:</p>
+	<h3>With border-collapse:</h3>
 	<p>Start: {start2}, end: {end2}</p>
 	<VirtualTable
 		items={filteredList}
@@ -72,20 +78,24 @@ Filter:
 		bind:start={start2}
 		bind:end={end2}
 	>
-		<tr slot="thead">
-			<th data-sort="title">Title</th>
-			<th data-sort="user">User</th>
-			<th data-sort="domain">Domain</th>
-			<th data-sort="time" data-sort-initial="descending">Time ago</th>
-			<th data-sort="comments_count">Comments</th>
-		</tr>
-		<tr slot="tbody" let:item class="tr">
-			<td class="td"><a href={item.url} target="_blank">{item.title}</a></td>
-			<td class="td">{item.user}</td>
-			<td class="td">{item.domain}</td>
-			<td class="td">{item.time_ago}</td>
-			<td class="td">{item.comments_count}</td>
-		</tr>
+		{#snippet thead()}
+			<tr>
+				<th data-sort="title">Title</th>
+				<th data-sort="user">User</th>
+				<th data-sort="domain">Domain</th>
+				<th data-sort="time" data-sort-initial="descending">Time ago</th>
+				<th data-sort="comments_count">Comments</th>
+			</tr>
+		{/snippet}
+		{#snippet trow(item)}
+			<tr class="tr">
+				<td class="td"><a href={item.url} target="_blank">{item.title}</a></td>
+				<td class="td">{item.user}</td>
+				<td class="td">{item.domain}</td>
+				<td class="td">{item.time_ago}</td>
+				<td class="td">{item.comments_count}</td>
+			</tr>
+		{/snippet}
 	</VirtualTable>
 {:catch error}
 	<p style="color: red">{error.message}</p>
