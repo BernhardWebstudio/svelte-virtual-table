@@ -312,7 +312,7 @@
         <tbody bind:this={contents} class="tbody" role="rowgroup">
             {#each visible as item}
                 <slot name="tbody" item={item.data} index={item.index}>
-                    Missing Table Row
+                    <tr>Missing Table Row</tr>
                 </slot>
             {/each}
         </tbody>

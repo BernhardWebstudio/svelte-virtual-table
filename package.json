@@ -1,6 +1,6 @@
 {
 	"name": "svelte-virtual-table",
-	"version": "2.0.0",
+	"version": "2.0.1",
 	"repository": {
 		"type": "git",
 		"url": "github.com/BernhardWebstudio/SvelteVirtualTable"
@@ -39,7 +39,7 @@
 		"!dist/**/*.spec.*"
 	],
 	"peerDependencies": {
-		"svelte": "^4.0.0"
+		"svelte": "^5.20.0"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.0.0",
