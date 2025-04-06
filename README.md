@@ -4,11 +4,11 @@ A sortable, virtual table for Svelte.
 Example App is available here: [bernhardwebstudio.github.io/svelte-virtual-table/](https://bernhardwebstudio.github.io/svelte-virtual-table/).
 
 - [Svelte: Virtual Table](#svelte-virtual-table)
-  - [Installation](#installation)
-  - [Useage](#useage)
-  - [Styling](#styling)
-  - [Development Notes](#development-notes)
-  - [Inspiration/Compatibility](#inspirationcompatibility)
+	- [Installation](#installation)
+	- [Useage](#useage)
+	- [Styling](#styling)
+	- [Development Notes](#development-notes)
+	- [Inspiration/Compatibility](#inspirationcompatibility)
 
 ## Installation
 
@@ -37,7 +37,7 @@ import VirtualTable from 'svelte-virtual-table';
 and use it, for example like so:
 
 ```js
-let myItemsArray = [];
+let items = $state([]);
 
 async function getData() {
 	let dataItems = [];
@@ -53,15 +53,15 @@ async function getData() {
 const dataPromise = getData();
 
 // TWO variables that can be bound to the VirtualTable
-let start; // the index of the first visible item
-let end; // the index of the last visible item
+let start = $state(0); // the index of the first visible item
+let end = $state(0); // the index of the last visible item
 ```
 
 ```svelte
 {#await dataPromise}
 	Loading...
 {:then}
-	<VirtualTable items={myItemsArray} class="anyClassIWantToAdd" bind:start bind:end>
+	<VirtualTable items={items} class="anyClassIWantToAdd" bind:start bind:end>
 		{#snippet thead()}
 			<tr>
 				<th data-sort="title">Title</th>
@@ -71,7 +71,7 @@ let end; // the index of the last visible item
 				<th data-sort="comments_count">Comments</th>
 			</tr>
 		{/snippet}
-		{#snippet trow(item)}
+		{#snippet trow(item, index)}
 			<tr>
 				<td>
 					<a href={item.url} target="_blank">{item.title}</a>
@@ -91,7 +91,7 @@ let end; // the index of the last visible item
 Pay attention to the `role` attributes: those are highly recommended if you want to have the table behave as such also in accessibility contexts.
 While this is not necessarily needed for ordinary tables, this one is required to use `display: block` on the table element (see Development Notes](#development-notes)), which in turn makes these role attributes necessary, still.
 
-You can find an example-app in the [GitHub Repo](https://github.com/BernhardWebstudio/svelte-virtual-table/tree/main/example-app).
+You can find an example-app in the [GitHub Repo](https://github.com/BernhardWebstudio/svelte-virtual-table/tree/main/src/routes).
 
 ## Styling
 
