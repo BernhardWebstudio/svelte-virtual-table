@@ -88,6 +88,19 @@ let end = $state(0); // the index of the last visible item
 {/await}
 ```
 
+make sure to add a height to the table:
+```html
+<style>
+html, body, #app {
+    margin: 0;
+    height: 100%;
+    width: 100%;
+}
+</style>
+```
+
+Here is a full copy of the code: https://github.com/RandallFlagg/Svelte-Virtual-Table-Test
+
 Pay attention to the `role` attributes: those are highly recommended if you want to have the table behave as such also in accessibility contexts.
 While this is not necessarily needed for ordinary tables, this one is required to use `display: block` on the table element (see Development Notes](#development-notes)), which in turn makes these role attributes necessary, still.
 
