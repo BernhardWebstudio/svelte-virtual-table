@@ -61,7 +61,7 @@ let end = $state(0); // the index of the last visible item
 {#await dataPromise}
 	Loading...
 {:then}
-	<VirtualTable items={items} class="anyClassIWantToAdd" bind:start bind:end>
+	<VirtualTable items={items} className="anyClassIWantToAdd" bind:start bind:end>
 		{#snippet thead()}
 			<tr>
 				<th data-sort="title">Title</th>
@@ -87,6 +87,9 @@ let end = $state(0); // the index of the last visible item
 	<p style="color: red">{error.message}</p>
 {/await}
 ```
+
+Additionally, you should make sure that you set a height on the parent element of the table,
+since it might either (a) collapse, or (b) have a complete height determined by the table rows, not needing to be virtual otherwise.
 
 Pay attention to the `role` attributes: those are highly recommended if you want to have the table behave as such also in accessibility contexts.
 While this is not necessarily needed for ordinary tables, this one is required to use `display: block` on the table element (see Development Notes](#development-notes)), which in turn makes these role attributes necessary, still.
