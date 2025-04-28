@@ -48,7 +48,7 @@ Filter:
 	<p>Loaded {filteredList.length} items.</p>
 	<h3>Without border-collapse:</h3>
 	<p>Start: {start}, end: {end}</p>
-	<VirtualTable items={filteredList} class="test1 test2" bind:start bind:end>
+	<VirtualTable items={filteredList} className="test1 test2" bind:start bind:end>
 		{#snippet thead()}
 			<tr>
 				<th data-sort="title">Title</th>
