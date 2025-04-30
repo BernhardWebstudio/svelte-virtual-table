@@ -1,32 +1,35 @@
 <script>
-	export const ssr = false;
+	import { onMount } from 'svelte';
 	import VirtualTable from '../lib/index';
 	// import VirtualTable from 'svelte-virtual-table'
 
 	let items = $state([]);
+	let searchTerm = $state('');
+	let start = $state(0);
+	let start2 = $state(0);
+	let end = $state(10);
+	let end2 = $state(10);
+
+	let dataPromise = $state(null);
 	async function getData() {
 		let dataItems = [];
 		for (let page = 1; page < 5; page++) {
 			let res = await fetch(`https://node-hnapi.herokuapp.com/news?page=${page}`);
 			let data = await res.json();
 			dataItems = dataItems.concat(data);
+			//dataItems = [...dataItems, ...data];
 		}
 		items = dataItems;
 		return items;
 	}
 
-	const dataPromise = getData();
-
-	let searchTerm = $state('');
+	onMount(() => {
+		dataPromise = getData(); // This ensures it updates reactively and correctly
+	});
 
 	let filteredList = $derived(
-		items.filter((item) => item.title.toUpperCase().indexOf(searchTerm.toUpperCase()) !== -1)
+		items.filter((item) => item.title.toUpperCase().includes(searchTerm.toUpperCase()))
 	);
-
-	let start = $state(0),
-		start2 = $state(0);
-	let end = $state(10),
-		end2 = $state(10);
 </script>
 
 <h1>Virtual Table Test</h1>

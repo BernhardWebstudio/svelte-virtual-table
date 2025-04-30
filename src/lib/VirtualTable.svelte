@@ -41,6 +41,7 @@
 		console.log('Deriving sorted items');
 		return sorted([...items], sortOrder);
 	});
+
 	let visible = $derived.by(() => {
 		console.log('Deriving visible items', [start, end]);
 		return sortedItems.slice(start, end).map((data, i) => {
@@ -190,7 +191,7 @@
 	// MARK: table sort stuff
 	let sortOrder = [[]];
 
-	const sorted = function (arr, sortOrder) {
+	const sorted = (arr, sortOrder) => {
 		arr.sort((a, b) => {
 			for (let [fieldName, r] of sortOrder) {
 				const reverse = r === 0 ? 1 : -1;
