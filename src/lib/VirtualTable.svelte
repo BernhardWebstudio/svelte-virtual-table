@@ -29,8 +29,8 @@
 	let headHeight = $state(0);
 	let footHeight = $state(0);
 	let heightMap = $state([]);
-	let mounted = $state();
-	let rows = $state();
+	let mounted = $state(false);
+	let rows = $state(null);
 	let theadElement = $state();
 	let top = $state(0);
 	let viewport = $state();
@@ -51,9 +51,15 @@
 
 	// whenever `items` changes, invalidate the current heightmap
 	$effect(() => {
-		if (items && mounted) {
-			console.log('Refreshing height map for ' + items.length + ' items');
-			refreshHeightMap(items, viewportHeight, itemHeight);
+		console.debug('Effect triggered: mounted =', mounted, 'items.length =', items.length);
+
+		if (mounted) {
+			if (items.length > 0) {
+				console.log('Refreshing height map for ' + items.length + ' items');
+				refreshHeightMap(items, viewportHeight, itemHeight);
+			} else {
+				console.debug('No items to refresh height map');
+			}
 		}
 	});
 
@@ -175,6 +181,13 @@
 	}
 
 	export async function scrollToIndex(index, opts) {
+		if (viewport) {
+			console.log('viewport is ready.');
+		} else {
+			console.warn('viewport is null or undefined.');
+			return;
+		}
+
 		const { scrollTop } = viewport;
 		const itemsDelta = index - start;
 		const _itemHeight = itemHeight || averageHeight;
@@ -253,24 +266,39 @@
 	onMount(() => {
 		// triggger initial refresh for virtual
 		rows = contents.children;
+		[...rows].forEach((trElement) => {
+			const firstTh = trElement.querySelector('th:first-child');
+			if (firstTh) {
+				debugger;
+				console.log('firstTh exists');
+				firstTh.setAttribute('role', 'rowheader'); // Row header for row labels
+			} else {
+				console.log('firstTh is null');
+			}
+		});
 		mounted = true;
+		console.debug('Before in onMount');
 		refreshHeightMap(items, viewportHeight, itemHeight);
+		console.debug('After in onMount');
 
 		// prepare sorting
-		const th = theadElement.getElementsByTagName('th');
-		for (let i = 0; i < th.length; i++) {
-			if (th[i].dataset.sort) {
-				th[i].className = CLASSNAME_SORTABLE;
-				th[i].onclick = (event) => updateSortOrder(th[i], event.shiftKey);
+		const thElements = theadElement.getElementsByTagName('th');
+		[...thElements].forEach((th) => {
+			th.setAttribute('role', 'columnheader');
+
+			if (th.dataset.sort) {
+				th.className = CLASSNAME_SORTABLE;
+				th.onclick = (event) => updateSortOrder(th, event.shiftKey);
 			}
-			if (th[i].dataset.sortInitial === 'descending') {
-				th[i].className = CLASSNAME_SORTABLE + ' ' + CLASSNAME_DESC;
-				sortOrder = [...sortOrder, [th[i].dataset.sort, 1]];
-			} else if (th[i].dataset.sortInitial != undefined) {
-				th[i].className = CLASSNAME_SORTABLE + ' ' + CLASSNAME_ASC;
-				sortOrder = [...sortOrder, [th[i].dataset.sort, 0]];
+
+			if (th.dataset.sortInitial === 'descending') {
+				th.className = CLASSNAME_SORTABLE + ' ' + CLASSNAME_DESC;
+				sortOrder = [...sortOrder, [th.dataset.sort, 1]];
+			} else if (th.dataset.sortInitial !== undefined) {
+				th.className = CLASSNAME_SORTABLE + ' ' + CLASSNAME_ASC;
+				sortOrder = [...sortOrder, [th.dataset.sort, 0]];
 			}
-		}
+		});
 	});
 </script>
 
@@ -282,18 +310,17 @@
 		bind:this={viewport}
 		bind:offsetHeight={viewportHeight}
 		onscroll={handleScroll}
-		role="table"
 		style="height: {height}; --bw-svt-p-top: {top}px; --bw-svt-p-bottom: {bottom}px; --bw-svt-head-height: {headHeight}px; --bw-svt-foot-height: {footHeight}px; --bw-svt-avg-row-height: {averageHeight}px"
 	>
-		<thead class="thead" bind:this={theadElement} bind:offsetHeight={headHeight} role="rowheader">
+		<thead class="thead" bind:this={theadElement} bind:offsetHeight={headHeight}>
 			{@render thead?.()}
 		</thead>
-		<tbody bind:this={contents} class="tbody" role="rowgroup">
+		<tbody bind:this={contents} class="tbody">
 			{#each visible as item, i}
 				{@render trow?.(item.data, item.index, i)}
 			{/each}
 		</tbody>
-		<tfoot class="tfoot" bind:offsetHeight={footHeight} role="rowgroup">
+		<tfoot class="tfoot" bind:offsetHeight={footHeight}>
 			{@render tfoot?.()}
 		</tfoot>
 	</table>
