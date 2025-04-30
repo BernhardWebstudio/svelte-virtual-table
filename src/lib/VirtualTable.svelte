@@ -202,7 +202,7 @@
 	}
 
 	// MARK: table sort stuff
-	let sortOrder = [[]];
+	let sortOrder = $state([[]]);
 
 	const sorted = (arr, sortOrder) => {
 		arr.sort((a, b) => {
