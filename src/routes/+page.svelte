@@ -1,32 +1,43 @@
 <script>
-	export const ssr = false;
+	import { onMount } from 'svelte';
 	import VirtualTable from '../lib/index';
 	// import VirtualTable from 'svelte-virtual-table'
 
 	let items = $state([]);
+	let searchTerm = $state('');
+	let start = $state(0);
+	let start2 = $state(0);
+	let end = $state(10);
+	let end2 = $state(10);
+
+	let dataPromise = $state(null);
 	async function getData() {
-		let dataItems = [];
-		for (let page = 1; page < 5; page++) {
-			let res = await fetch(`https://node-hnapi.herokuapp.com/news?page=${page}`);
-			let data = await res.json();
-			dataItems = dataItems.concat(data);
+		let cachedData = localStorage.getItem('hnData');
+
+		if (cachedData) {
+			items = JSON.parse(cachedData);
+		} else {
+			let dataItems = [];
+			for (let page = 1; page < 5; page++) {
+				let res = await fetch(`https://node-hnapi.herokuapp.com/news?page=${page}`);
+				let data = await res.json();
+				dataItems = dataItems.concat(data);
+				//dataItems = [...dataItems, ...data];
+			}
+			items = dataItems;
+			localStorage.setItem('hnData', JSON.stringify(items)); // Cache for next reload
 		}
-		items = dataItems;
+
 		return items;
 	}
 
-	const dataPromise = getData();
-
-	let searchTerm = $state('');
+	onMount(() => {
+		dataPromise = getData(); // This ensures it updates reactively and correctly
+	});
 
 	let filteredList = $derived(
-		items.filter((item) => item.title.toUpperCase().indexOf(searchTerm.toUpperCase()) !== -1)
+		items.filter((item) => item.title.toUpperCase().includes(searchTerm.toUpperCase()))
 	);
-
-	let start = $state(0),
-		start2 = $state(0);
-	let end = $state(10),
-		end2 = $state(10);
 </script>
 
 <h1>Virtual Table Test</h1>
@@ -40,7 +51,7 @@
 </p>
 
 Filter:
-<input bind:value={searchTerm} />
+<input bind:value={searchTerm} id="searchTerm" />
 
 {#await dataPromise}
 	Loading...
@@ -48,55 +59,62 @@ Filter:
 	<p>Loaded {filteredList.length} items.</p>
 	<h3>Without border-collapse:</h3>
 	<p>Start: {start}, end: {end}</p>
-	<VirtualTable items={filteredList} className="test1 test2" bind:start bind:end>
-		{#snippet thead()}
-			<tr>
-				<th data-sort="title">Title</th>
-				<th data-sort="user">User</th>
-				<th data-sort="domain">Domain</th>
-				<th data-sort="time" data-sort-initial="descending">Time ago</th>
-				<th data-sort="comments_count">Comments</th>
-			</tr>
-		{/snippet}
-		{#snippet trow(item, index)}
-			<tr class="tr">
-				<td class="td"><a href={item.url} target="_blank">{item.title}</a></td>
-				<td class="td">{item.user}</td>
-				<td class="td">{item.domain}</td>
-				<td class="td">{item.time_ago}</td>
-				<td class="td">{item.comments_count}</td>
-			</tr>
-		{/snippet}
-	</VirtualTable>
+	<div class="virtual-table-demo">
+		<VirtualTable items={filteredList} className="test1 test2" bind:start bind:end>
+			{#snippet thead()}
+				<tr>
+					<th data-sort="title">Title</th>
+					<th data-sort="user">User</th>
+					<th data-sort="domain">Domain</th>
+					<th data-sort="time" data-sort-initial="descending">Time ago</th>
+					<th data-sort="comments_count">Comments</th>
+				</tr>
+			{/snippet}
+			{#snippet trow(item, index, rowHeight)}
+				<tr class="tr" style="height: {rowHeight}px;">
+					<td class="td"><a href={item.url} target="_blank">{item.title}</a></td>
+					<td class="td">{item.user}</td>
+					<td class="td">{item.domain}</td>
+					<td class="td">{item.time_ago}</td>
+					<td class="td">{item.comments_count}</td>
+				</tr>
+			{/snippet}
+			{#snippet tfoot()}
+				<!-- Add TEST-->
+			{/snippet}
+		</VirtualTable>
+	</div>
 
 	<h3>With border-collapse:</h3>
 	<p>Start: {start2}, end: {end2}</p>
-	<VirtualTable
-		items={filteredList}
-		class="test1 test2"
-		requireBorderCollapse="true"
-		bind:start={start2}
-		bind:end={end2}
-	>
-		{#snippet thead()}
-			<tr>
-				<th data-sort="title">Title</th>
-				<th data-sort="user">User</th>
-				<th data-sort="domain">Domain</th>
-				<th data-sort="time" data-sort-initial="descending">Time ago</th>
-				<th data-sort="comments_count">Comments</th>
-			</tr>
-		{/snippet}
-		{#snippet trow(item)}
-			<tr class="tr">
-				<td class="td"><a href={item.url} target="_blank">{item.title}</a></td>
-				<td class="td">{item.user}</td>
-				<td class="td">{item.domain}</td>
-				<td class="td">{item.time_ago}</td>
-				<td class="td">{item.comments_count}</td>
-			</tr>
-		{/snippet}
-	</VirtualTable>
+	<div class="virtual-table-demo">
+		<VirtualTable
+			items={filteredList}
+			class="test1 test2"
+			requireBorderCollapse="true"
+			bind:start={start2}
+			bind:end={end2}
+		>
+			{#snippet thead()}
+				<tr>
+					<th data-sort="title">Title</th>
+					<th data-sort="user">User</th>
+					<th data-sort="domain">Domain</th>
+					<th data-sort="time" data-sort-initial="descending">Time ago</th>
+					<th data-sort="comments_count">Comments</th>
+				</tr>
+			{/snippet}
+			{#snippet trow(item)}
+				<tr class="tr">
+					<td class="td"><a href={item.url} target="_blank">{item.title}</a></td>
+					<td class="td">{item.user}</td>
+					<td class="td">{item.domain}</td>
+					<td class="td">{item.time_ago}</td>
+					<td class="td">{item.comments_count}</td>
+				</tr>
+			{/snippet}
+		</VirtualTable>
+	</div>
 {:catch error}
 	<p style="color: red">{error.message}</p>
 {/await}
@@ -111,15 +129,33 @@ Filter:
 </p>
 
 <style>
+	/* :global(html),
 	:global(body) {
+		height: 100%;
+		margin: 0;
+		padding: 0;
+	} */
+
+	.virtual-table-demo {
+		/* display: flex;
+		flex-direction: column; */
+		/* Define an explicit height; you can adjust this value as needed */
+		height: 400px;
+		/* Alternatively, set both height and max-height if you want a cap: */
+		/* max-height: 50vh; */
+		/* Remove margins if they interfere with available space */
+		/* margin: 20px 0; */
+	}
+
+	/* :global(body) {
 		background-color: white;
-	}
+	} */
 
-	:global(table) {
+	/* :global(table) {
 		min-height: min(10rem, 50vh);
-	}
+	} */
 
-	:global(.test1) {
+	/* :global(.test1) {
 		width: 100%;
 		border: 1px solid black;
 	}
@@ -127,12 +163,12 @@ Filter:
 	:global(.test1 thead) {
 		text-align: left;
 		border-bottom: 10px solid black;
-	}
+	} */
 
 	/**
   * This border is only visible when 
   */
-	:global(.test1 tr) {
+	/* :global(.test1 tr) {
 		border-bottom: 10px solid grey;
 		border-top: 10px solid grey;
 	}
@@ -142,12 +178,12 @@ Filter:
 	}
 	:global(.test1 th:not(:last-of-type)) {
 		border-right: 1px solid grey;
-	}
+	} */
 
 	/**
   * Specify fixed widths
   */
-	.td:first-of-type,
+	/* .td:first-of-type,
 	td:first-of-type,
 	:global(.test1 th:first-of-type) {
 		width: 45vw;
@@ -164,5 +200,5 @@ Filter:
 	.td:last-of-type,
 	td:last-of-type {
 		text-align: right;
-	}
+	} */
 </style>
